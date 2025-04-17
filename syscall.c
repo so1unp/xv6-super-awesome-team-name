@@ -104,6 +104,7 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_trace(void);
+extern int sys_answer(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -127,7 +128,8 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_trace]   sys_trace
+[SYS_trace]   sys_trace,
+[SYS_answer]  sys_answer
 };
 
 extern int trace;
@@ -154,24 +156,23 @@ static char* syscalls_names[] = {
 [SYS_link]    "sys_link",
 [SYS_mkdir]   "sys_mkdir",
 [SYS_close]   "sys_close",
-[SYS_trace]   "sys_trace"
+[SYS_trace]   "sys_trace",
+[SYS_answer]  "sys_answer"
 };
 
-void
-syscall(void)
-{
+void syscall(void) {
   int num;
   struct proc *curproc = myproc();
 
-  num = curproc->tf->eax;
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    curproc->tf->eax = syscalls[num]();
-    if (trace > 0) {
-        cprintf("[%d] %s: %d\n", num, syscalls_names[num], curproc->tf->eax);
-    }
+  num = curproc->tf->eax;  // Obtiene el número de la llamada al sistema
+  if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+      curproc->tf->eax = syscalls[num]();  // Ejecuta la llamada al sistema
+      if (trace > 0) {  // Si la trazabilidad está habilitada
+          cprintf("[%d] %s: %d\n", num, syscalls_names[num], curproc->tf->eax);
+      }
   } else {
-    cprintf("%d %s: unknown sys call %d\n",
-            curproc->pid, curproc->name, num);
-    curproc->tf->eax = -1;
+      cprintf("%d %s: unknown sys call %d\n",
+              curproc->pid, curproc->name, num);
+      curproc->tf->eax = -1;
   }
 }

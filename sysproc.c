@@ -8,6 +8,7 @@
 #include "proc.h"
 
 int trace;
+int answer;
 
 int
 sys_fork(void)
@@ -98,5 +99,11 @@ sys_trace(void)
     if (argint(0, &trace) < 0)
         return -1;
     return 0;
+}
+
+int 
+sys_answer(void)
+{
+  return 42;
 }
 

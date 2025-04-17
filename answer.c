@@ -5,9 +5,9 @@
 #include "user.h"
 #include "date.h"
 
-int main(int argc, char *argv[])
-{
-    // Descomentar una vez implementada la llamada al sistema.
-    //printf(1, "%d\n", answer());
+int main(void) {
+    int res = answer();
+    printf(1, "%d\n", res);
     exit();
-}
+  }
+  

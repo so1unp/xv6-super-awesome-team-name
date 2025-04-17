@@ -4,6 +4,7 @@
 #include "user.h"
 #include "fcntl.h"
 
+
 // Parsed command representation
 #define EXEC  1
 #define REDIR 2
@@ -12,6 +13,13 @@
 #define BACK  5
 
 #define MAXARGS 10
+
+// Salidas
+#define STDOUT 1
+#define STDIN 0
+#define STDERR 2
+
+
 
 struct cmd {
   int type;
@@ -57,10 +65,10 @@ struct cmd *parsecmd(char*);
 void
 runcmd(struct cmd *cmd)
 {
-  struct backcmd *bcmd;
+//  struct backcmd *bcmd;
   struct execcmd *ecmd;
-  struct listcmd *lcmd;
-  struct pipecmd *pcmd;
+//  struct listcmd *lcmd;
+//  struct pipecmd *pcmd;
   struct redircmd *rcmd;
 
   if(cmd == 0)
@@ -71,17 +79,29 @@ runcmd(struct cmd *cmd)
     panic("runcmd");
 
   case EXEC:
-    ecmd = (struct execcmd*)cmd;
-    if(ecmd->argv[0] == 0)
-      exit();
-    printf(2, "exec not implemented\n");
-    break;
+    ecmd = (struct execcmd *) cmd;
+    if (ecmd->argv[0] == 0)
+        exit();
+    // Eliminar el mensaje de error e implementar
+    // la ejecución de comandos.
+    exec(ecmd->argv[0], ecmd->argv);
+
+  printf(STDERR, "ocurrio un error a la hora de ejecutar el comando \n");
+  break;
 
   case REDIR:
-    printf(2, "redir not implemented\n");
-    //rcmd = (struct redircmd*)cmd;
-    //runcmd(rcmd->cmd);
-    break;
+  // Eliminar el mensaje de error e implementar
+            // la redirección de entrada y salida estándar.
+            rcmd = (struct redircmd *) cmd;
+            close (rcmd->fd);
+            unsigned int fd = open (rcmd->file, rcmd->mode);
+
+            if (fd < 0) {
+                perror("Redireccionamiento invalido");
+                exit();
+            }
+            runcmd(rcmd->cmd);
+            break;
 
   case LIST:
     printf(2, "list not implemented\n");
@@ -465,3 +485,5 @@ nulterminate(struct cmd *cmd)
   }
   return cmd;
 }
+
+
